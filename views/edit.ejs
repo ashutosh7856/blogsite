@@ -1,0 +1,12 @@
+<%- include('partials/header.ejs')%>
+<!-- main area here  -->
+
+<form action="/update/<%= title %>?_method=PUT" method="POST" id="fll">
+    <div class="text-center d-flex flex-column p-5 mx-5 justify-items-center">
+        <input type="text" name="title" value="<%= title %>" required>
+        <textarea name="content" required rows="18" cols="18"><%= content %></textarea>
+        <input type="submit" value="Update">
+    </div>
+</form>
+
+<%- include('partials/footer.ejs')%>

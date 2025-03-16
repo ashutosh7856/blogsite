@@ -1,0 +1,17 @@
+<%- include('partials/header.ejs')%>
+
+<!-- This is Navbar section code inside the header -->
+
+<div class="home">
+    <ul>
+        <% blogTitle.forEach(post => { %>
+            <li><a href="/post/<%= post %>"><%= post %></a></li>
+        <% }) %>
+    </ul>
+</div>
+
+
+
+
+ <!-- footer starts here -->
+<%- include('partials/footer.ejs')%>

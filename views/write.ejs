@@ -1,0 +1,11 @@
+<%- include('partials/header.ejs')%>
+<!-- main area here  -->
+    <form action="/submit" method="post">
+    <div class="text-center d-flex flex-column p-5 mx-5 justify-items-center">
+        <input type="text" name="title" id="" placeholder="Title goes here">
+        <textarea name="blogpost" id="" placeholder="Write Your Blog Here." rows="18" cols="18" class="my-2"></textarea>
+        <input type="submit" value="Post">
+      </div>  
+    </form>
+
+<%- include('partials/footer.ejs')%>
