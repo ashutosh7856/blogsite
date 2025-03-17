@@ -25,7 +25,7 @@ app.get('/write', (req, res)=>{
 // for writing articles on the website and it adds to the main array 
 app.post('/submit', (req, res)=>{
     const postit={
-        key:req.body.title,
+        key:(req.body.title).trim(),
         content:req.body.blogpost,
     }
     blogPosts.push(postit);
