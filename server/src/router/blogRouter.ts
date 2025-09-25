@@ -5,8 +5,8 @@ import { getAllBlogs, getBlogById } from "../controller/blogController.js";
 
 const router = Router()
 
-router.get('/blogs', authMiddleware, getAllBlogs)
-router.get('/blog/:id', authMiddleware, getBlogById)
+router.get('/all', authMiddleware, getAllBlogs)
+router.get('/:id', authMiddleware, getBlogById)
 
 
 

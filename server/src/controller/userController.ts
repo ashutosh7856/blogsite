@@ -1,4 +1,4 @@
-import { signInSchema, signUpSchema, updateUserSchema } from "../schemas/userSchema.js";
+import { blogSchema, signInSchema, signUpSchema, updateUserSchema } from "../schemas/userSchema.js";
 import type { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken"
@@ -10,7 +10,7 @@ export async function signUp(req:Request, res:Response){
     const validation = signUpSchema.safeParse(req.body)
 
     if(!validation.success){
-        return res.status(411).json({
+        return res.status(400).json({
             message:"Incorrect  Input",
             errors:validation.error.issues
         })
@@ -18,8 +18,22 @@ export async function signUp(req:Request, res:Response){
 
     const signUpData = validation.data
 
+
+
     try {
+        const isUser = await client.users.findFirst({
+            where:{
+                email:signUpData.email
+            }
+        })
+
+        if(isUser){
+            return res.status(409).json({
+                message:"user already exist."
+            })
+        }
         const hashedPassword = await bcrypt.hash(signUpData.password, 10)
+
         const user = await client.users.create({
             data:{...signUpData, password:hashedPassword}
         })
@@ -40,7 +54,7 @@ export async function signIn(req:Request, res:Response){
     const validation = signInSchema.safeParse(req.body)
 
     if(!validation.success){
-        return res.status(411).json({
+        return res.status(400).json({
             message:'Incorrect input'
         })
     }
@@ -58,7 +72,7 @@ export async function signIn(req:Request, res:Response){
         }
         const verified = await bcrypt.compare(validation.data.password, User.password)
         if(!verified){
-            return res.json(401).json({
+            return res.status(401).json({
                 message:'wrong password'
             })
         }
@@ -215,6 +229,36 @@ export async function updateUser(req:Request, res:Response){
     })
 
 
+}
+
+
+
+export async function createBlog(req:Request, res:Response){
+    const validation = blogSchema.safeParse(req.body)
+
+    if(!validation.success){
+        return res.status(401).json({
+            message:'incorrect input'
+        })
+    }
+
+    const blogData = validation.data
+
+    try{
+        const blog = await client.blogs.create({
+            data:{
+                title: blogData.title,
+                body: blogData.body as string,
+                userId:req.userId
+            }
+        })
+         return res.json({
+            message:'blog created.',
+            blog:blog
+         })
+    }catch{
+        // 
+    }
 }
 
 

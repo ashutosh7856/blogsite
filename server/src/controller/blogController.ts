@@ -7,7 +7,7 @@ const client = new PrismaClient()
 
 export async function getAllBlogs(req:Request, res:Response){
     try{
-        const blogs = await client.blogs.findMany({})
+        const blogs = await client.blogs.findMany({take : 10})
 
         if(!blogs){
             return res.json({
@@ -47,7 +47,7 @@ export async function getBlogById(req:Request, res:Response){
         }
 
         return res.json({
-            message:"blogs found",
+            message:"blogs found by id",
             blog:blog
         })
     }catch{

@@ -20,7 +20,7 @@ export function authMiddleware(req:Request, res:Response, next:NextFunction){
         })
     }
 
-    if(req.userId === (verified as any).id){
+    if((verified as any).id){
 
         req.userId = (verified as any).id
 
