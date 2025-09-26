@@ -38,6 +38,13 @@ export async function signUp(req:Request, res:Response){
             data:{...signUpData, password:hashedPassword}
         })
         const token = jwt.sign({id:user.id, email:user.email}, 'none')
+
+        const profile = await client.profile.create({
+            data:{
+                userId:user.id,
+                bio:'random bio change it'
+            }
+        })
         return res.status(200).json({
             message:'User created successfully.',
             token:token
@@ -95,15 +102,13 @@ export async function signIn(req:Request, res:Response){
 
 export async function getUser(req:Request, res:Response){
     try{
-        const profile = await client.profile.findFirst({
-            where: { userId:req.userId },
-            select: {
-            id: true,
-            bio:true,
-            }
-        })
 
-        if(!profile){
+        const [profile, user] = await Promise.all([
+            await client.profile.findFirst({where:{userId:req.userId}, select:{id:true, bio:true}}),
+            await client.users.findFirst({where:{id:req.userId}, select:{name:true, email:true}})
+        ])
+
+        if(!user){
             return res.status(404).json({
                 message:"No User Found",
             })
@@ -111,7 +116,7 @@ export async function getUser(req:Request, res:Response){
 
         return res.status(200).json({
             message:"Found",
-            profile:profile
+            profile:{...profile, ...user}
         })
     }catch{
         // ignore

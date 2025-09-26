@@ -42,8 +42,8 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({ value, onChange, isE
         class: 'prose prose-sm sm:prose lg:prose-lg focus:outline-none p-6',
       },
       handleDOMEvents: {
-        contextmenu: (view, event) => {
-            if (isEditable) {
+        contextmenu: (_view,event) => {
+              if (isEditable) {
             event.preventDefault();
             const position = getOptimalMenuPosition(event as MouseEvent);
             setContextMenu({
