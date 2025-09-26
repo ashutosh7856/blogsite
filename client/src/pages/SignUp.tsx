@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Input from "../components/ui/Input";
+import Toast from "../components/ui/Toast";
 
 export default function SignUp() {
   const [loginActive, setLoginActive] = useState(true);
-  const [error, setError] = useState<string | null>(null)
+  
   const [formData, setFormData] = useState({
     name:'',
     email:'',
@@ -12,6 +13,8 @@ export default function SignUp() {
     confirmPassword:''
   })
   const navigate = useNavigate()
+  const [loading, setLoading] = useState(false)
+  const [toast, setToast] = useState<{message:string,type?:'success'|'error'|'info'}|null>(null)
 
 
 
@@ -24,14 +27,16 @@ export default function SignUp() {
 
   async function login(){
     try {
+      setLoading(true)
       const apiUrl = import.meta.env.VITE_API_URL
       if(!apiUrl){
-        setError('No api url found.')
+        setToast({message:'No api url found.', type:'error'})
+        setLoading(false)
         return 
       }
 
       const payload = {email:formData.email, password:formData.password}
-      const response = await fetch(`http://localhost:3000/api/v1/user/signin`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/user/signin`, {
         method:'POST',
         headers:{
           Accept:'application/json',
@@ -41,38 +46,46 @@ export default function SignUp() {
       })
 
       if(!response.ok){
-        console.error(response.statusText, error)
+        const text = await response.text().catch(()=>response.statusText)
+        setToast({message:text || 'Login failed', type:'error'})
+        setLoading(false)
         return
       }
 
       const result = await response.json()
       localStorage.setItem('token', result.token)
-      console.log(result)
+      setToast({message:'Logged in', type:'success'})
+      setLoading(false)
       navigate('/')
     }catch{
-      // 
+      setLoading(false)
+      setToast({message:'An unexpected error occurred', type:'error'})
     }
   }
 
 
   async function signup(){
     try{
+      setLoading(true)
       const apiUrl = import.meta.env.VITE_API_URL
       if(!apiUrl){
-        setError('No api url found')
+        setToast({message:'No api url found', type:'error'})
+        setLoading(false)
         return 
       }
       if(formData.password.length < 8){
-        setError('Password must be at least 8 characters long')
+        setToast({message:'Password must be at least 8 characters long', type:'error'})
+        setLoading(false)
         return
       }
 
       if(formData.password !== formData.confirmPassword){
-        setError('Passwords do not match')
+        setToast({message:'Passwords do not match', type:'error'})
+        setLoading(false)
         return
       }
       const payload = {email:formData.email, password:formData.password, name:formData.name}
-      const response = await fetch(`http://localhost:3000/api/v1/user/signup`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/user/signup`, {
         method:"POST",
         headers:{
           Accept:'application/json',
@@ -82,16 +95,20 @@ export default function SignUp() {
       })
 
       if(!response.ok){
-        console.error(response.statusText)
+        const text = await response.text().catch(()=>response.statusText)
+        setToast({message:text || 'Signup failed', type:'error'})
+        setLoading(false)
         return
       }
 
       const result = await response.json()
       localStorage.setItem('token', result.token)
-      console.log(result)
+      setToast({message:'Account created', type:'success'})
+      setLoading(false)
       navigate('/')
     }catch{
-      // 
+      setLoading(false)
+      setToast({message:'An unexpected error occurred', type:'error'})
     }
   }
 
@@ -125,18 +142,20 @@ export default function SignUp() {
                     <Input type="password" name="password" value={formData.password} onChange={onChange} placeholder="password"/>
                     <Input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={onChange} placeholder="confirm password"/>
 
-                    <button onClick={signup} className="w-[448px] bg-[#12a3ed] rounded-[8px] px-4 text-white text-[14px] font-bold h-10 hover:bg-[#2980ac]">
-                        Sign Up
-                    </button>
+          <button onClick={signup} disabled={loading} className="w-[448px] bg-[#12a3ed] rounded-[8px] px-4 text-white text-[14px] font-bold h-10 hover:bg-[#2980ac] flex items-center justify-center">
+            {loading ? <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"/> : null}
+            Sign Up
+          </button>
                 </>
 
              ):(
                 <>
                  <Input type="email" name="email" value={formData.email} onChange={onChange} placeholder="your@emai.com" />
                 <Input type="password" name="password" value={formData.password} onChange={onChange} placeholder="secret123" />
-                <button onClick={login} className="w-[448px] bg-[#12a3ed] rounded-[8px] px-4 text-white text-[14px] font-bold h-10 hover:bg-[#2980ac]">
-                    Log In
-                </button>
+        <button onClick={login} disabled={loading} className="w-[448px] bg-[#12a3ed] rounded-[8px] px-4 text-white text-[14px] font-bold h-10 hover:bg-[#2980ac] flex items-center justify-center">
+          {loading ? <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"/> : null}
+          Log In
+        </button>
                 </>
              )
              }
@@ -159,6 +178,7 @@ export default function SignUp() {
         <div className="text-[14px] font-normal text-[#617D8A] py-3">
           Forgot password?
         </div>
+        {toast ? <Toast message={toast.message} type={toast.type} onClose={()=>setToast(null)} /> : null}
       </div>
     </div>
   );

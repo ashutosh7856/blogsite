@@ -23,7 +23,7 @@ export default function Profile(){
                 return
             }
             async function fetchUser(){
-            const response = await fetch(`http://localhost:3000/api/v1/user/my-profile`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/user/my-profile`, {
                 headers:{
                     'Content-Type':'application/json',
                     authorization:`Bearer ${token}`

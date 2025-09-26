@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { TiptapEditor } from "../components/TextEditor";
 import { useNavigate } from "react-router-dom";
+import Toast from "../components/ui/Toast";
 
 export default function CreatePost() {
     const [blog, setBlog] = useState({
@@ -8,12 +9,15 @@ export default function CreatePost() {
         body:''
     })
     const navigate = useNavigate()
+  const [loading, setLoading] = useState(false)
+  const [toast, setToast] = useState<{message:string,type?:'success'|'error'|'info'}|null>(null)
 
     async function createBlog(){
         try{
+      setLoading(true)
             const token = localStorage.getItem('token')
             const payload = {title:blog.title, body:blog.body}
-            const response = await fetch(`http://localhost:3000/api/v1/user/create-blog`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/user/create-blog`, {
                 method:'POST',
                 headers:{
                     'Content-Type':'application/json',
@@ -21,11 +25,19 @@ export default function CreatePost() {
                 },
                 body:JSON.stringify(payload)
             })
-            const result = await response.json()
-            alert(result.message)
-            navigate('/')
+      if(!response.ok){
+        const text = await response.text().catch(()=>response.statusText)
+        setToast({message: text || 'Failed to create post', type:'error'})
+        setLoading(false)
+        return
+      }
+      const result = await response.json()
+      setToast({message: result.message || 'Post created', type:'success'})
+      setLoading(false)
+      navigate('/')
         }catch{
-            // 
+      setLoading(false)
+      setToast({message:'An unexpected error occurred', type:'error'})
         }
     }
   return (
@@ -51,11 +63,14 @@ export default function CreatePost() {
         <div className="py-4 px-4 flex justify-end">
           <button 
           onClick={createBlog}
+          disabled={loading}
           className="bg-[#12A3ED] rounded-[8px] text-[14px] font-medium px-3 py-1.5  text-white flex items-center justify-center overflow-clip whitespace-nowrap">
+            {loading ? <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"/> : null}
             Publish
           </button>
         </div>
       </div>
+      {toast ? <Toast message={toast.message} type={toast.type} onClose={()=>setToast(null)} /> : null}
     </div>
   );
 }

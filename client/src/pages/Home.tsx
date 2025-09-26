@@ -25,7 +25,7 @@ export default function Home(){
 
     useEffect(()=>{
         async function fetchBlogs(){
-            const response = await fetch(`http://localhost:3000/api/v1/blog/all`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/blog/all`, {
                 headers:{
                     'Content-Type':'application/json'
                 }
