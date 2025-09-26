@@ -11,10 +11,18 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.13",
+    "@tiptap/core": "^3.6.1",
+    "@tiptap/extension-link": "^3.6.1",
+    "@tiptap/extension-underline": "^3.6.1",
+    "@tiptap/react": "^3.6.1",
+    "@tiptap/starter-kit": "^3.6.1",
+    "firebase": "^12.3.0",
+    "lucide-react": "^0.544.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.9.2",
     "tailwindcss": "^4.1.13",
+    "tiptap": "^0.15.0",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
